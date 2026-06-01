@@ -759,7 +759,7 @@ function calcular() {
     ? 'Opcional para corridas até 1h'
     : totalH <= 2.5
       ? '40 g/h — 1 gel tradicional a cada 30min'
-      : '60 g/h — exige adaptação intestinal prévia (>2h30)';
+      : '60 g/h — para evitar o "muro". Exige adaptação intestinal prévia. Consuma 1 gel de alta performance (30g) ou 1 gel tradicional + fonte extra (bananinha/isotônico) a cada 30min.';
 
   // ── ALERTAS ──
   document.getElementById('warnSweat').classList.toggle('visible', sweatWarning);
@@ -803,7 +803,7 @@ function calcular() {
       <div class="sched-chips">
         <span class="chip w">💧 Água ${w} ml</span>
         <span class="chip s">🧂 Sódio ${s} mg</span>
-        ${totalH > 1 ? `<span class="chip c">⚡ Carbo ${c} g <span style="font-weight:400;opacity:.75">(1 gel)</span></span>` : ''}
+        ${totalH > 1 ? `<span class="chip c">⚡ Carbo ${c} g <span style="font-weight:400;opacity:.75">${totalH > 2.5 ? '(gel 30g ou gel+extra)' : '(1 gel)'}</span></span>` : ''}
       </div>`;
     schedBody.appendChild(row);
   }
@@ -812,7 +812,11 @@ function calcular() {
   const gelTip = document.getElementById('gelTip');
   if (totalH > 1) {
     const totalGeis = schedSlotsShow;
-    gelTip.innerHTML = `⚡ <strong>Dica de abastecimento:</strong> Leve <strong>${totalGeis} géis tradicionais</strong> (~20 g de carbo cada) — 1 gel por ponto de abastecimento.`;
+    if (totalH > 2.5) {
+      gelTip.innerHTML = `⚡ <strong>Dica de abastecimento:</strong> Leve <strong>${totalGeis} géis de alta performance</strong> (~30 g cada) — ou alterne 1 gel tradicional + 1 fonte extra (bananinha, isotônico) a cada ponto. Treine o intestino antes!`;
+    } else {
+      gelTip.innerHTML = `⚡ <strong>Dica de abastecimento:</strong> Leve <strong>${totalGeis} géis tradicionais</strong> (~20 g de carbo cada) — 1 gel por ponto de abastecimento.`;
+    }
     gelTip.classList.add('visible');
   } else {
     gelTip.classList.remove('visible');
