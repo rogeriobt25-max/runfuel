@@ -265,11 +265,12 @@ main { max-width: 860px; margin: 0 auto; padding: 32px 16px 80px; }
   font-size: 11px; letter-spacing: 3px; color: var(--muted);
   text-transform: uppercase; margin-bottom: 14px;
 }
-.sched-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.sched-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
 .sched-row:last-child { border-bottom: none; }
-.sched-time { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--accent); min-width: 44px; }
-.sched-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { display: flex; align-items: center; gap: 4px; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+.sched-time { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--accent); min-width: 44px; padding-top: 4px; }
+.sched-chips { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 3px; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; border: 1px solid transparent; white-space: nowrap; }
+@media(max-width:400px){ .chip { font-size: 10px; padding: 3px 6px; } }
 .chip.w { background: var(--water-bg);  color: var(--water);  border-color: #bae6fd; }
 .chip.s { background: var(--sodium-bg); color: var(--sodium); border-color: #fed7aa; }
 .chip.c { background: var(--carb-bg);   color: var(--carb);   border-color: #ddd6fe; }
