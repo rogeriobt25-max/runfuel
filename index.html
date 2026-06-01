@@ -371,14 +371,6 @@ footer { text-align: center; font-size: 11px; color: var(--muted); padding: 0 20
   <!-- ─── INPUTS PRINCIPAIS ─── -->
   <div class="section-label">Dados da Corrida</div>
 
-  <!-- Pré-sets de prova -->
-  <div class="preset-row">
-    <button class="preset-btn" onclick="applyPreset(0,25,'5K')">5K <span>~25min</span></button>
-    <button class="preset-btn" onclick="applyPreset(0,50,'10K')">10K <span>~50min</span></button>
-    <button class="preset-btn" onclick="applyPreset(1,45,'Meia')">Meia <span>~1h45</span></button>
-    <button class="preset-btn" onclick="applyPreset(3,45,'Maratona')">Maratona <span>~3h45</span></button>
-  </div>
-
   <div class="inputs-grid">
     <!-- Duração -->
     <div class="input-group">
@@ -514,6 +506,8 @@ footer { text-align: center; font-size: 11px; color: var(--muted); padding: 0 20
 
   <!-- ─── RESULTS ─── -->
   <div id="resultsSection">
+
+    <div class="results-label">Recomendação para <span id="resLabel">—</span></div>
 
     <!-- Exportar PDF -->
     <div class="share-bar">
