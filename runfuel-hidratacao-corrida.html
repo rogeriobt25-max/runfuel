@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RunFuel — Calculadora de Nutrição para Corrida</title>
+
+<!-- Open Graph / WhatsApp / redes sociais -->
+<meta property="og:title" content="RunFuel — Calculadora de Nutrição para Corrida">
+<meta property="og:description" content="Descubra exatamente quanto beber, repor de sódio e consumir de carboidrato em cada corrida. Grátis, sem cadastro.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RunFuel — Calculadora de Nutrição para Corrida">
+<meta name="twitter:description" content="Descubra exatamente quanto beber, repor de sódio e consumir de carboidrato em cada corrida. Grátis, sem cadastro.">
+<meta name="description" content="Calculadora gratuita de hidratação e nutrição para corrida. Baseada em ACSM e ISSN. Gera cronograma de abastecimento personalizado.">
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f2;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --border: #e4e1db;
+  --border-strong: #d0ccc4;
+  --accent: #f03e00;
+  --accent-hover: #d43500;
+  --accent2: #e8890c;
+  --text: #1a1714;
+  --text2: #3d3830;
+  --muted: #7a7168;
+  --muted2: #a09890;
+  --water: #0284c7;
+  --water-bg: #e0f2fe;
+  --sodium: #c2520a;
+  --sodium-bg: #fff0e6;
+  --carb: #6d28d9;
+  --carb-bg: #ede9fe;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--text);
+  padding: 40px 24px 36px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+header::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+}
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 11vw, 96px);
+  letter-spacing: 5px; line-height: 1;
+  color: #ffffff;
+}
+.logo span { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+.tagline {
+  font-size: 11px; font-weight: 500; letter-spacing: 4px;
+  text-transform: uppercase; color: #ffffff80; margin-top: 8px;
+}
+
+/* ── MAIN ── */
+main { max-width: 860px; margin: 0 auto; padding: 32px 16px 80px; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px; letter-spacing: 3px;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 10px; margin-top: 28px;
+}
+.section-label:first-of-type { margin-top: 0; }
+
+/* ── PRESET BUTTONS ── */
+.preset-row {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.preset-btn {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.preset-btn span { font-size: 10px; font-weight: 400; color: var(--muted2); }
+.preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+.preset-btn.active { border-color: var(--accent); color: var(--accent); background: #fff5f2; }
+
+/* ── GRID ── */
+.inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media(max-width:540px){ .inputs-grid { grid-template-columns: 1fr; } }
+
+/* ── INPUT GROUP ── */
+.input-group {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.input-group:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(240,62,0,.08);
+}
+.input-group label {
+  display: block;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.input-group .opt-badge {
+  font-size: 9px; letter-spacing: 1px; font-weight: 500;
+  color: var(--muted2);
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 6px; margin-left: 6px;
+  vertical-align: middle;
+}
+.field-row { display: flex; align-items: center; gap: 8px; }
+.field-row input[type=number],
+.field-row input[type=text],
+.field-row select {
+  flex: 1;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px; font-weight: 600;
+  padding: 9px 12px;
+  outline: none;
+  width: 100%;
+  -moz-appearance: textfield;
+  transition: border-color .2s;
+}
+.field-row input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+.field-row input:focus, .field-row select:focus {
+  border-color: var(--accent); background: #fff;
+}
+.field-unit { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; min-width: 28px; }
+.time-fields { display: flex; gap: 8px; }
+.time-fields input { flex: 1; min-width: 0; }
+.time-sep { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--border-strong); align-self: center; }
+.field-hint { font-size: 11px; color: var(--muted2); margin-top: 7px; line-height: 1.4; }
+
+/* ── CALCULATE BUTTON ── */
+.calc-btn {
+  display: block; width: 100%; margin-top: 16px;
+  background: var(--accent);
+  border: none; border-radius: 12px;
+  color: #fff; font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 4px;
+  padding: 17px; cursor: pointer;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  box-shadow: 0 4px 16px rgba(240,62,0,.25), 0 1px 3px rgba(240,62,0,.15);
+}
+.calc-btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(240,62,0,.32); }
+.calc-btn:active { transform: translateY(0); }
+
+/* ── RESULTS ── */
+#resultsSection { display: none; }
+.results-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px; letter-spacing: 3px; color: var(--muted);
+  text-transform: uppercase; margin-bottom: 14px; margin-top: 32px;
+}
+.results-label span { color: var(--accent); }
+
+/* ── SHARE BAR ── */
+.share-bar {
+  display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.share-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 8px 14px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: var(--muted); cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.share-btn:hover { border-color: var(--accent); color: var(--accent); }
+.share-btn.copied { border-color: #22c55e; color: #16a34a; }
+
+/* ── CARDS ── */
+.cards-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; margin-bottom: 12px;
+}
+@media(max-width:540px){ .cards-grid { grid-template-columns: 1fr; } }
+.result-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 20px 18px;
+  animation: fadeUp .35s ease both;
+  position: relative; overflow: hidden;
+}
+.result-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+}
+.result-card.water::before  { background: var(--water); }
+.result-card.sodium::before { background: var(--sodium); }
+.result-card.carb::before   { background: var(--carb); }
+.result-card.water  { border-color: #bae6fd; }
+.result-card.sodium { border-color: #fed7aa; }
+.result-card.carb   { border-color: #ddd6fe; }
+.result-card:nth-child(1){ animation-delay:.05s; }
+.result-card:nth-child(2){ animation-delay:.10s; }
+.result-card:nth-child(3){ animation-delay:.15s; }
+.card-icon { font-size: 22px; margin-bottom: 8px; margin-top: 4px; }
+.card-lbl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+.water  .card-lbl { color: var(--water); }
+.sodium .card-lbl { color: var(--sodium); }
+.carb   .card-lbl { color: var(--carb); }
+.per-hour { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px,5vw,52px); line-height: 1; color: var(--text); }
+.per-hour-unit { font-size: 12px; color: var(--muted); font-weight: 400; }
+.divider-h { height: 1px; background: var(--border); margin: 12px 0; }
+.total-row { display: flex; justify-content: space-between; align-items: baseline; }
+.total-lbl { font-size: 11px; color: var(--muted); font-weight: 500; }
+.total-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); }
+.total-unit { font-size: 11px; color: var(--muted); margin-left: 3px; }
+.range-note { font-size: 11px; color: var(--muted2); margin-top: 5px; line-height: 1.4; }
+
+/* ── HEAT ALERT ── */
+.heat-alert {
+  display: none;
+  background: #fff1f0; border: 1.5px solid #fca5a5;
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 12px;
+  font-size: 12px; color: #991b1b; line-height: 1.6;
+  animation: fadeUp .3s ease both;
+}
+.heat-alert.visible { display: block; }
+
+/* ── DETAIL TABLE ── */
+.detail-box {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-bottom: 12px;
+  animation: fadeUp .35s .2s ease both;
+}
+.detail-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px; letter-spacing: 3px; color: var(--muted);
+  text-transform: uppercase; margin-bottom: 14px;
+}
+.sched-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.sched-row:last-child { border-bottom: none; }
+.sched-time { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--accent); min-width: 44px; }
+.sched-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: flex; align-items: center; gap: 4px; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+.chip.w { background: var(--water-bg);  color: var(--water);  border-color: #bae6fd; }
+.chip.s { background: var(--sodium-bg); color: var(--sodium); border-color: #fed7aa; }
+.chip.c { background: var(--carb-bg);   color: var(--carb);   border-color: #ddd6fe; }
+
+/* ── GEL TIP ── */
+.gel-tip {
+  display: none;
+  margin-top: 12px; padding: 10px 14px;
+  background: var(--carb-bg); border: 1px solid #ddd6fe;
+  border-radius: 8px; font-size: 12px; color: #4c1d95; line-height: 1.5;
+}
+.gel-tip.visible { display: block; }
+
+/* ── DISCLAIMER ── */
+.disclaimer-box {
+  background: #f0faf2; border: 1.5px solid #bbf7d0;
+  border-radius: 12px; padding: 14px 18px;
+  font-size: 12px; color: #166534; line-height: 1.6;
+  margin-bottom: 12px; animation: fadeUp .35s .25s ease both;
+}
+.disclaimer-box strong { color: #14532d; }
+
+/* ── SWEAT / ADVANCED ── */
+.sweat-test-box { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; margin-top: 28px; }
+.sweat-test-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; cursor: pointer; border-bottom: 1px solid transparent; transition: background .15s; user-select: none; }
+.sweat-test-header:hover { background: #faf9f7; }
+.sweat-test-header.open { border-bottom-color: var(--border); background: #faf9f7; }
+.sweat-test-title { display: flex; align-items: center; gap: 10px; }
+.sweat-test-title span:first-child { font-size: 20px; }
+.sweat-test-title strong { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--text); }
+.sweat-test-title em { font-style: normal; font-size: 11px; color: var(--muted); display: block; letter-spacing: 0.5px; margin-top: 1px; }
+.chevron { font-size: 11px; color: var(--muted); transition: transform .25s; }
+.sweat-test-header.open .chevron { transform: rotate(180deg); }
+.sweat-test-body { display: none; padding: 20px; }
+.sweat-test-body.open { display: block; }
+.sweat-explainer { font-size: 13px; color: var(--text2); line-height: 1.65; background: var(--bg); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; border-left: 3px solid var(--accent2); }
+.sweat-explainer strong { color: var(--text); }
+.sweat-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+@media(max-width:540px){ .sweat-inputs { grid-template-columns: 1fr; } }
+.sweat-calc-btn { background: transparent; border: 2px solid var(--accent2); color: var(--accent2); font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; border-radius: 10px; padding: 12px 20px; cursor: pointer; transition: background .2s, color .2s; width: 100%; }
+.sweat-calc-btn:hover { background: var(--accent2); color: #fff; }
+.sweat-result { display: none; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px; padding: 14px 16px; margin-top: 12px; font-size: 13px; color: #92400e; line-height: 1.6; }
+.sweat-result strong { color: #78350f; font-size: 16px; }
+.apply-btn { display: inline-block; margin-top: 10px; background: var(--accent2); color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px; border: none; border-radius: 8px; padding: 8px 18px; cursor: pointer; transition: background .2s; }
+.apply-btn:hover { background: #c97208; }
+
+/* ── WARNING BOX ── */
+.warn-box { display: none; background: #fff7ed; border: 1.5px solid #fdba74; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; font-size: 12px; color: #9a3412; line-height: 1.6; animation: fadeUp .3s ease both; }
+.warn-box.visible { display: block; }
+
+/* ── SWITCH ── */
+.switch-group .switch-row { display: flex; align-items: center; padding: 6px 0; }
+.switch-wrap { display: flex; align-items: center; gap: 10px; }
+.switch-input { display: none; }
+.switch-track { position: relative; display: inline-block; width: 46px; height: 26px; background: var(--border-strong); border-radius: 13px; cursor: pointer; transition: background .25s; flex-shrink: 0; }
+.switch-track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform .25s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.switch-input:checked + .switch-track { background: var(--accent); }
+.switch-input:checked + .switch-track::after { transform: translateX(20px); }
+.switch-state { font-size: 13px; font-weight: 600; color: var(--muted); min-width: 28px; transition: color .2s; }
+.switch-input:checked ~ .switch-state { color: var(--accent); }
+
+/* ── ADVANCED SECTION ── */
+.advanced-box { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 10px; margin-bottom: 4px; }
+.advanced-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; cursor: pointer; user-select: none; transition: background .15s; }
+.advanced-header:hover { background: #faf9f7; }
+.advanced-title { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+.advanced-body { max-height: 0; overflow: hidden; transition: max-height .3s ease, padding .3s ease; padding: 0 14px; }
+.advanced-body.open { max-height: 900px; padding: 14px; border-top: 1px solid var(--border); }
+.advanced-body .inputs-grid { gap: 10px; }
+
+/* ── PRINT / PDF ── */
+@media print {
+  @page { margin: 18mm 14mm; }
+  header, main > .section-label, main > .preset-row,
+  main > .inputs-grid, main > .advanced-box, main > .calc-btn,
+  .share-bar, .warn-box, .heat-alert, .disclaimer-box,
+  .divider, footer { display: none !important; }
+  body { background: #fff; }
+  #resultsSection { display: block !important; }
+  .results-label { margin-top: 0; }
+  .result-card, .detail-box { break-inside: avoid; box-shadow: none; }
+  .cards-grid { grid-template-columns: repeat(3,1fr); }
+}
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.divider { height: 1px; background: var(--border); margin: 28px 0; }
+footer { text-align: center; font-size: 11px; color: var(--muted); padding: 0 20px 40px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Run<span>Fuel</span></div>
+  <div class="tagline">Calculadora de Nutrição para Corrida · ACSM &amp; ISSN</div>
+</header>
+
+<main>
+
+  <!-- ─── INPUTS PRINCIPAIS ─── -->
+  <div class="section-label">Dados da Corrida</div>
+
+  <!-- Pré-sets de prova -->
+  <div class="preset-row">
+    <button class="preset-btn" onclick="applyPreset(0,25,'5K')">5K <span>~25min</span></button>
+    <button class="preset-btn" onclick="applyPreset(0,50,'10K')">10K <span>~50min</span></button>
+    <button class="preset-btn" onclick="applyPreset(1,45,'Meia')">Meia <span>~1h45</span></button>
+    <button class="preset-btn" onclick="applyPreset(3,45,'Maratona')">Maratona <span>~3h45</span></button>
+  </div>
+
+  <div class="inputs-grid">
+    <!-- Duração -->
+    <div class="input-group">
+      <label>Duração Prevista <span style="color:var(--accent);font-size:9px">● OBRIGATÓRIO</span></label>
+      <div class="time-fields">
+        <div class="field-row">
+          <input type="number" id="durH" min="0" max="24" placeholder="0" value="">
+          <span class="field-unit">h</span>
+        </div>
+        <span class="time-sep">:</span>
+        <div class="field-row">
+          <input type="number" id="durMin" min="0" max="59" placeholder="00" value="">
+          <span class="field-unit">min</span>
+        </div>
+      </div>
+      <div class="field-hint">Ex: 3h30min = 3h e 30min</div>
+    </div>
+
+    <!-- Temperatura -->
+    <div class="input-group">
+      <label>Temperatura Ambiente <span style="color:var(--accent);font-size:9px">● OBRIGATÓRIO</span></label>
+      <div class="field-row">
+        <input type="number" id="temp" min="-5" max="45" placeholder="25" value="">
+        <span class="field-unit">°C</span>
+      </div>
+      <div class="field-hint">Temperatura no horário da corrida</div>
+    </div>
+
+    <!-- Peso -->
+    <div class="input-group">
+      <label>Peso Corporal <span class="opt-badge">OPCIONAL</span></label>
+      <div class="field-row">
+        <input type="number" id="weight" min="30" max="150" placeholder="70" value="">
+        <span class="field-unit">kg</span>
+      </div>
+      <div class="field-hint">Ajusta levemente a hidratação recomendada</div>
+    </div>
+
+    <!-- Suor Salgado -->
+    <div class="input-group switch-group">
+      <label>Suor Salgado?</label>
+      <div class="switch-row">
+        <div class="switch-wrap">
+          <input type="checkbox" id="saltySweater" class="switch-input">
+          <label for="saltySweater" class="switch-track"><span class="switch-thumb"></span></label>
+          <span class="switch-state" id="switchLabel">Não</span>
+        </div>
+      </div>
+      <div class="field-hint">Seu suor costuma deixar manchas brancas na roupa ou arder os olhos?</div>
+    </div>
+  </div>
+
+  <!-- ─── CONFIGURAÇÕES AVANÇADAS ─── -->
+  <div class="advanced-box">
+    <div class="advanced-header" id="advHeader" onclick="toggleAdvanced()">
+      <span class="advanced-title">⚙ Configurações Avançadas &amp; Teste de Suor</span>
+      <span class="chevron" id="advChevron">▼</span>
+    </div>
+    <div class="advanced-body" id="advBody">
+      <div class="inputs-grid" style="margin-top:0; margin-bottom:14px;">
+        <div class="input-group">
+          <label>Umidade Relativa <span class="opt-badge">OPCIONAL</span></label>
+          <div class="field-row">
+            <input type="number" id="humidity" min="0" max="100" placeholder="60" value="">
+            <span class="field-unit">%</span>
+          </div>
+          <div class="field-hint">Não utilizado no cálculo principal — registre para referência</div>
+        </div>
+        <div class="input-group">
+          <label>Taxa de Suor Personalizada <span class="opt-badge">OPCIONAL</span></label>
+          <div class="field-row">
+            <input type="number" id="sweatRate" min="100" max="2000" placeholder="—" value="">
+            <span class="field-unit">ml/h</span>
+          </div>
+          <div class="field-hint">Calculada no Teste de Suor abaixo. Limita-se a 800 ml/h.</div>
+        </div>
+      </div>
+
+      <!-- Teste de Suor embutido -->
+      <div style="border-top:1px solid var(--border); padding-top:16px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+          <span style="font-size:18px;">🧪</span>
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2px; color:var(--text);">TESTE DE SUOR</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:1px;">Calcule sua taxa personalizada</div>
+          </div>
+        </div>
+        <div class="sweat-explainer">
+          Faça uma corrida de <strong>aproximadamente 1 hora</strong> em ritmo habitual.
+          Pese-se antes e depois (sem roupas, após secar o suor), registre quanto líquido ingeriu e informe abaixo.<br><br>
+          <strong>Fórmula:</strong> Taxa de suor (L/h) = (Peso antes − Peso depois + Líquido ingerido) ÷ Horas de exercício
+        </div>
+        <div class="sweat-inputs">
+          <div class="input-group">
+            <label>Peso Antes</label>
+            <div class="field-row">
+              <input type="number" id="stBefore" min="30" max="200" placeholder="70.0" step="0.1">
+              <span class="field-unit">kg</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Peso Depois</label>
+            <div class="field-row">
+              <input type="number" id="stAfter" min="30" max="200" placeholder="69.2" step="0.1">
+              <span class="field-unit">kg</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Líquido Ingerido</label>
+            <div class="field-row">
+              <input type="number" id="stFluid" min="0" max="5000" placeholder="500">
+              <span class="field-unit">ml</span>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Duração do Treino</label>
+            <div class="field-row">
+              <input type="number" id="stDur" min="0.25" max="4" step="0.25" placeholder="1.0">
+              <span class="field-unit">horas</span>
+            </div>
+          </div>
+        </div>
+        <button class="sweat-calc-btn" onclick="calcSweat()">🧮 CALCULAR MINHA TAXA DE SUOR</button>
+        <div class="sweat-result" id="sweatResult">
+          <div id="sweatResultText"></div>
+          <button class="apply-btn" onclick="applySweat()">↑ USAR ESTA TAXA NA CALCULADORA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcular()">▶ CALCULAR</button>
+
+  <!-- ─── RESULTS ─── -->
+  <div id="resultsSection">
+
+    <div class="results-label">Recomendação para <span id="resLabel">—</span></div>
+
+    <!-- Exportar PDF -->
+    <div class="share-bar">
+      <button class="share-btn" onclick="exportarPDF()">📄 Exportar resultado em PDF</button>
+    </div>
+
+    <!-- Aviso taxa elevada -->
+    <div class="warn-box" id="warnSweat">
+      ⚠️ <strong>Taxa de suor muito elevada detectada.</strong> A recomendação de hidratação foi limitada a 800 ml/h, que é a faixa prática máxima segura para corredores recreativos (ACSM). Para estratégias avançadas com taxas acima desse valor, considere avaliação com um nutricionista esportivo.
+    </div>
+
+    <!-- Alerta calor extremo -->
+    <div class="heat-alert" id="heatAlert">
+      🌡️ <strong>Atenção: calor extremo.</strong> Acima de 32°C o risco de hipertermia aumenta significativamente. Reduza o ritmo, priorize sombra e pontos de refresco, e monitore sinais de tontura, confusão ou pausa na sudorese — se ocorrerem, pare imediatamente.
+    </div>
+
+    <div class="cards-grid">
+      <div class="result-card water">
+        <div class="card-icon">💧</div>
+        <div class="card-lbl">Hidratação</div>
+        <div class="per-hour" id="rWaterH">—</div>
+        <div class="per-hour-unit">ml / hora</div>
+        <div class="divider-h"></div>
+        <div class="total-row">
+          <span class="total-lbl">Em movimento</span>
+          <span><span class="total-val" id="rWaterT">—</span><span class="total-unit">ml</span></span>
+        </div>
+        <div class="range-note" id="rWaterRange"></div>
+      </div>
+
+      <div class="result-card sodium">
+        <div class="card-icon">🧂</div>
+        <div class="card-lbl">Sódio</div>
+        <div class="per-hour" id="rSodiumH">—</div>
+        <div class="per-hour-unit">mg / hora</div>
+        <div class="divider-h"></div>
+        <div class="total-row">
+          <span class="total-lbl">Em movimento</span>
+          <span><span class="total-val" id="rSodiumT">—</span><span class="total-unit">mg</span></span>
+        </div>
+        <div class="range-note" id="rSodiumRange"></div>
+      </div>
+
+      <div class="result-card carb">
+        <div class="card-icon">⚡</div>
+        <div class="card-lbl">Carboidrato</div>
+        <div class="per-hour" id="rCarbH">—</div>
+        <div class="per-hour-unit">g / hora</div>
+        <div class="divider-h"></div>
+        <div class="total-row">
+          <span class="total-lbl">Em movimento</span>
+          <span><span class="total-val" id="rCarbT">—</span><span class="total-unit">g</span></span>
+        </div>
+        <div class="range-note" id="rCarbRange"></div>
+      </div>
+    </div>
+
+    <!-- Cronograma -->
+    <div class="detail-box">
+      <div class="detail-title">Cronograma de Abastecimento (a cada 30 min)</div>
+      <div id="schedBody"></div>
+      <!-- Dica de géis -->
+      <div class="gel-tip" id="gelTip"></div>
+    </div>
+
+    <!-- Hidratação Pós-Prova -->
+    <div class="detail-box" style="border-color:#bae6fd;">
+      <div class="detail-title" style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:16px;">🏁</span> Hidratação Pós-Prova
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <span style="font-size:18px; flex-shrink:0; margin-top:1px;">💧</span>
+          <div>
+            <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--water); margin-bottom:3px;">Ao cruzar a linha de chegada</div>
+            <div style="font-size:13px; color:var(--text2); line-height:1.6;">Inicie a reidratação bebendo <strong>300–500 ml</strong> de fluidos na primeira hora pós-corrida — preferencialmente isotônico, água de coco ou, se não tiver à mão, água acompanhada de um lanche salgado.</div>
+          </div>
+        </div>
+        <div style="height:1px; background:var(--border);"></div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <span style="font-size:18px; flex-shrink:0; margin-top:1px;">🌤️</span>
+          <div>
+            <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--water); margin-bottom:3px;">Ao longo do dia</div>
+            <div style="font-size:13px; color:var(--text2); line-height:1.6;">Continue bebendo água em pequenos goles até que sua urina atinja um <strong>tom amarelo-claro</strong> — sinal de que a reidratação está completa.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aviso -->
+    <div class="disclaimer-box">
+      ⚠️ <strong>Estes valores são estimativas.</strong> Necessidades individuais variam conforme condicionamento, aclimatização, genética e tipo de suor.
+      Ajuste conforme sua resposta pessoal e, se possível, oriente-se com um <strong>nutricionista esportivo</strong>.
+      Fontes: ACSM Position Stand (2007), ISSN Exercise &amp; Sport Nutrition Review (2018), Maughan &amp; Shirreffs.
+    </div>
+
+  </div>
+
+</main>
+
+<div class="divider" style="max-width:860px;margin:0 auto;"></div>
+<footer>
+  RunFuel · Baseado em ACSM &amp; ISSN · Valores são estimativas — consulte um profissional de saúde
+</footer>
+
+<script>
+// ── HELPERS ──
+function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+function fmtTime(h) {
+  const hh = Math.floor(h);
+  const mm = Math.round((h - hh) * 60);
+  if (hh === 0) return `${mm}min`;
+  if (mm === 0) return `${hh}h`;
+  return `${hh}h${mm}min`;
+}
+
+// ── PRÉ-SETS ──
+let activePreset = null;
+function applyPreset(h, min, name) {
+  document.getElementById('durH').value   = h;
+  document.getElementById('durMin').value = min;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  activePreset = name;
+}
+
+// ── SWITCH LABEL ──
+document.getElementById('saltySweater').addEventListener('change', function() {
+  document.getElementById('switchLabel').textContent = this.checked ? 'Sim' : 'Não';
+});
+
+// ── TOGGLE ADVANCED ──
+function toggleAdvanced() {
+  document.getElementById('advBody').classList.toggle('open');
+  document.getElementById('advChevron').style.transform =
+    document.getElementById('advBody').classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+// ── TOGGLE SWEAT TEST ──
+function toggleSweat() {
+  document.getElementById('sweatHeader').classList.toggle('open');
+  document.getElementById('sweatBody').classList.toggle('open');
+}
+
+// ── CALCULAR TAXA DE SUOR ──
+let calculatedSweatRate = null;
+
+function calcSweat() {
+  const before = val('stBefore');
+  const after  = val('stAfter');
+  const fluid  = val('stFluid');
+  const dur    = val('stDur') || 1;
+
+  if (!before || !after) { alert('Informe o peso antes e depois do treino.'); return; }
+
+  const lossKg = before - after;
+  const lossL  = lossKg + (fluid / 1000);
+  const rateMl = Math.round((lossL / dur) * 1000);
+  calculatedSweatRate = rateMl;
+
+  let classify = rateMl < 500 ? 'Baixa' : rateMl < 800 ? 'Moderada' : rateMl < 1200 ? 'Alta' : 'Muito Alta';
+  const deficit   = Math.round(lossKg * 100) / 100;
+  const pct       = before > 0 ? Math.round(lossKg / before * 1000) / 10 : 0;
+  const repCapped = Math.max(400, Math.min(800, rateMl));
+  const capNote   = rateMl > 800
+    ? '<br><em style="color:#fb923c">⚠️ Taxa acima de 800 ml/h — reposição limitada ao teto recomendado (ACSM).</em>'
+    : '';
+
+  document.getElementById('sweatResultText').innerHTML =
+    `<strong>${rateMl} ml/h</strong> — Sudorese ${classify}<br><br>
+     Você perdeu aproximadamente <strong>${deficit} kg</strong> (${pct}% do peso inicial).<br>
+     Recomendação aplicada na calculadora: <strong>${repCapped} ml/h</strong> (teto ACSM: 400–800 ml/h).${capNote}`;
+  document.getElementById('sweatResult').style.display = 'block';
+}
+
+function applySweat() {
+  if (calculatedSweatRate) {
+    const body = document.getElementById('advBody');
+    if (!body.classList.contains('open')) toggleAdvanced();
+    document.getElementById('sweatRate').value = calculatedSweatRate;
+    document.querySelector('.calc-btn').scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+}
+
+// ── EXPORTAR PDF ──
+function exportarPDF() {
+  window.print();
+}
+
+// ── CALCULAR PRINCIPAL ──
+function calcular() {
+  const durH   = val('durH');
+  const durMin = val('durMin');
+  const temp   = parseFloat(document.getElementById('temp').value);
+  const peso   = val('weight');
+  const salgado    = document.getElementById('saltySweater').checked;
+  const sweatInput = val('sweatRate');
+
+  const totalH = durH + durMin / 60;
+
+  if (totalH <= 0 || isNaN(temp)) {
+    alert('Preencha a duração e a temperatura antes de calcular.'); return;
+  }
+  if (sweatInput > 2000) {
+    alert('⚠️ Taxa de suor acima de 2000 ml/h parece incorreta. Verifique os dados. A recomendação será limitada a 800 ml/h.');
+  }
+
+  const schedSlots     = Math.floor(totalH / 0.5);
+  const schedSlotsShow = (totalH % 0.5 < 0.01) ? schedSlots - 1 : schedSlots;
+
+  // ── HIDRATAÇÃO ──
+  let hidratacaoHora;
+  if (sweatInput > 0) {
+    hidratacaoHora = Math.max(400, Math.min(800, sweatInput));
+  } else {
+    hidratacaoHora = 500;
+    if (temp >= 15 && temp < 22)  hidratacaoHora = 550;
+    if (temp >= 22 && temp <= 28) hidratacaoHora = 650;
+    if (temp > 28)                hidratacaoHora = 750;
+    if (peso > 0 && peso < 60)    hidratacaoHora -= 50;
+    if (peso > 0 && peso > 85)    hidratacaoHora += 50;
+    hidratacaoHora = Math.max(400, Math.min(800, hidratacaoHora));
+  }
+  const totalHidratacao = Math.round(hidratacaoHora * 0.5) * schedSlotsShow;
+  const sweatWarning    = sweatInput > 800;
+  const waterSource     = sweatInput > 0
+    ? (sweatWarning ? 'taxa personalizada limitada a 800 ml/h' : `taxa personalizada (${sweatInput} ml/h)`)
+    : 'estimativa baseada em temperatura e peso corporal';
+
+  // ── SÓDIO ──
+  let sodioHora;
+  if (temp > 30)       sodioHora = 600;
+  else if (temp >= 25) sodioHora = 400;
+  else                 sodioHora = 300;
+  if (salgado) sodioHora = Math.min(600, sodioHora + 200);
+  const totalSodio = Math.round(sodioHora * 0.5) * schedSlotsShow;
+  const sodioNote  = temp > 30
+    ? (salgado ? 'Calor intenso + suor salgado (600 mg/h)' : 'Calor intenso > 30°C (600 mg/h)')
+    : temp >= 25
+      ? (salgado ? 'Calor + suor salgado (600 mg/h)' : 'Calor ≥ 25°C (400 mg/h)')
+      : (salgado ? 'Suor salgado (500 mg/h)' : 'Recomendação para suor normal');
+
+  // ── CARBOIDRATO ──
+  let carboHora = 40;
+  if (totalH > 2.5) carboHora = 60;
+  const totalCarbo = Math.round(carboHora * 0.5) * schedSlotsShow;
+  const carboNote  = totalH <= 1
+    ? 'Opcional para corridas até 1h'
+    : totalH <= 2.5
+      ? '40 g/h — 1 gel tradicional a cada 30min'
+      : '60 g/h — exige adaptação intestinal prévia (>2h30)';
+
+  // ── ALERTAS ──
+  document.getElementById('warnSweat').classList.toggle('visible', sweatWarning);
+  document.getElementById('heatAlert').classList.toggle('visible', temp > 32);
+
+  // ── RENDER CARDS ──
+  document.getElementById('resLabel').textContent = fmtTime(totalH);
+
+  document.getElementById('rWaterH').textContent      = hidratacaoHora.toLocaleString('pt-BR');
+  document.getElementById('rWaterT').textContent      = totalHidratacao.toLocaleString('pt-BR');
+  document.getElementById('rWaterRange').textContent  = `Fonte: ${waterSource}`;
+
+  document.getElementById('rSodiumH').textContent     = sodioHora.toLocaleString('pt-BR');
+  document.getElementById('rSodiumT').textContent     = totalSodio.toLocaleString('pt-BR');
+  document.getElementById('rSodiumRange').textContent = sodioNote;
+
+  if (totalH <= 1) {
+    document.getElementById('rCarbH').textContent = '–';
+    document.getElementById('rCarbT').textContent = '–';
+  } else {
+    document.getElementById('rCarbH').textContent = carboHora;
+    document.getElementById('rCarbT').textContent = totalCarbo;
+  }
+  document.getElementById('rCarbRange').textContent = carboNote;
+
+  // ── CRONOGRAMA ──
+  const schedBody = document.getElementById('schedBody');
+  schedBody.innerHTML = '';
+  for (let i = 1; i <= schedSlotsShow; i++) {
+    const t  = i * 0.5;
+    const w  = Math.round(hidratacaoHora * 0.5);
+    const s  = Math.round(sodioHora      * 0.5);
+    const c  = Math.round(carboHora      * 0.5);
+    const hh = Math.floor(t);
+    const mm = Math.round((t - hh) * 60);
+    const label = hh > 0 ? `${hh}h${mm > 0 ? mm.toString().padStart(2,'0') : '00'}` : `${mm}min`;
+    const row = document.createElement('div');
+    row.className = 'sched-row';
+    row.innerHTML = `
+      <span class="sched-time">${label}</span>
+      <div class="sched-chips">
+        <span class="chip w">Água ${w} ml</span>
+        <span class="chip s">Sódio ${s} mg</span>
+        ${totalH > 1 ? `<span class="chip c">Carbo ${c} g <span style="font-weight:400;opacity:.75">(1 gel)</span></span>` : ''}
+      </div>`;
+    schedBody.appendChild(row);
+  }
+
+  // ── DICA DE GÉIS ──
+  const gelTip = document.getElementById('gelTip');
+  if (totalH > 1) {
+    const totalGeis = schedSlotsShow;
+    gelTip.innerHTML = `⚡ <strong>Dica de abastecimento:</strong> Leve <strong>${totalGeis} géis tradicionais</strong> (~20 g de carbo cada) — 1 gel por ponto de abastecimento.`;
+    gelTip.classList.add('visible');
+  } else {
+    gelTip.classList.remove('visible');
+  }
+
+  // ── SHOW ──
+  const sec = document.getElementById('resultsSection');
+  sec.style.display = 'block';
+  sec.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+</script>
+</body>
+</html>
