@@ -7,12 +7,12 @@
 
 <!-- Open Graph / WhatsApp / redes sociais -->
 <meta property="og:title" content="RunFuel — Calculadora de Nutrição para Corrida">
-<meta property="og:description" content="Descubra exatamente quanto beber, repor de sódio e consumir de carboidrato em cada corrida. Grátis, sem cadastro.">
+<meta property="og:description" content="Descubra quanto e quando repor água, sódio e carboidrato na sua corrida de forma personalizada.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RunFuel — Calculadora de Nutrição para Corrida">
-<meta name="twitter:description" content="Descubra exatamente quanto beber, repor de sódio e consumir de carboidrato em cada corrida. Grátis, sem cadastro.">
+<meta name="twitter:description" content="Descubra quanto e quando repor água, sódio e carboidrato na sua corrida de forma personalizada.">
 <meta name="description" content="Calculadora gratuita de hidratação e nutrição para corrida. Baseada em ACSM e ISSN. Gera cronograma de abastecimento personalizado.">
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
@@ -268,12 +268,8 @@ main { max-width: 860px; margin: 0 auto; padding: 32px 16px 80px; }
 .sched-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
 .sched-row:last-child { border-bottom: none; }
 .sched-time { font-family: 'Bebas Neue', sans-serif; font-size: 15px; color: var(--accent); min-width: 44px; padding-top: 4px; }
-.sched-chips { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
-.chip { display: inline-flex; align-items: center; gap: 3px; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; border: 1px solid transparent; white-space: nowrap; }
-@media(max-width:540px){
-  .sched-chips { flex-direction: column; gap: 4px; }
-  .chip { width: fit-content; }
-}
+.sched-chips { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 3px; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; border: 1px solid transparent; white-space: nowrap; width: fit-content; }
 .chip.w { background: var(--water-bg);  color: var(--water);  border-color: #bae6fd; }
 .chip.s { background: var(--sodium-bg); color: var(--sodium); border-color: #fed7aa; }
 .chip.c { background: var(--carb-bg);   color: var(--carb);   border-color: #ddd6fe; }
